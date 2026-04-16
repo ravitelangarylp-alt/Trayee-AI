@@ -37,6 +37,15 @@ def chat():
         
         print(f"✅ Received response from Gemini!", flush=True)
         return jsonify({"reply": response.text})
+        
+    except Exception as e:
+        print(f"🔥 GEMINI API ERROR: {str(e)}", flush=True)
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)        
+        print(f"✅ Received response from Gemini!", flush=True)
+        return jsonify({"reply": response.text})
     
     except Exception as e:
         print(f"🔥 GEMINI API ERROR: {str(e)}", flush=True)
