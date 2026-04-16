@@ -6,7 +6,7 @@ import anthropic
 app = Flask(__name__)
 CORS(app)
 
-api_key = os.environ.get("GOOGLE_API_KEY")
+api_key = os.environ.get("CLAUDE_API_KEY")
 client = anthropic.Anthropic(api_key=api_key)
 
 @app.route('/chat', methods=['POST'])
