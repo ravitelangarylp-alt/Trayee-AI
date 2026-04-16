@@ -29,7 +29,7 @@ def chat():
         print("👉 Sending prompt to Gemini...", flush=True)
         
         response = client.models.generate_content(
-            model='gemini-pro',
+            model = genai.GenerativeModel('gemini-2.0-flash')
             contents=prompt
         )
         
