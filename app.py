@@ -7,7 +7,6 @@ app = Flask(__name__)
 CORS(app)
 
 api_key = os.environ.get("GOOGLE_API_KEY")
-
 if api_key:
     print(f"✅ API Key found: {api_key[:5]}...{api_key[-4:]}", flush=True)
 else:
@@ -23,13 +22,13 @@ def chat():
         
         if not user_message:
             return jsonify({"error": "No message provided"}), 400
-
+        
         prompt = f"You are 'Trayee AI', an expert Sanskrit chatbot. You must reply to the user's query strictly in the Sanskrit language using the Devanagari script. User Query: {user_message}"
         
         print("👉 Sending prompt to Gemini...", flush=True)
         
         response = client.models.generate_content(
-            model = genai.GenerativeModel('gemini-2.0-flash')
+            model="gemini-2.0-flash",
             contents=prompt
         )
         
