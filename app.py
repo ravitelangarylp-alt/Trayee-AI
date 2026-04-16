@@ -1,13 +1,13 @@
 import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from google import genai
+import anthropic
 
 app = Flask(__name__)
 CORS(app)
 
 api_key = os.environ.get("GOOGLE_API_KEY")
-client = genai.Client(api_key=api_key)
+client = anthropic.Anthropic(api_key=api_key)
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -16,12 +16,20 @@ def chat():
         user_message = data.get("message", "")
         if not user_message:
             return jsonify({"error": "No message provided"}), 400
+
         prompt = f"You are 'Trayee AI', an expert Sanskrit chatbot. Reply strictly in Sanskrit using Devanagari script. User Query: {user_message}"
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt
+
+        print("👉 Sending prompt to Claude...", flush=True)
+
+        message = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=1024,
+            messages=[{"role": "user", "content": prompt}]
         )
-        return jsonify({"reply": response.text})
+
+        print("✅ Received response!", flush=True)
+        return jsonify({"reply": message.content[0].text})
+
     except Exception as e:
         print(f"🔥 ERROR: {str(e)}", flush=True)
         return jsonify({"error": str(e)}), 500
