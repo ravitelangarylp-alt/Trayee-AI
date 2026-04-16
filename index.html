@@ -203,8 +203,7 @@
 
                 try {
                     // ೩. ಪೈಥಾನ್ ಬ್ಯಾಕೆಂಡ್‌ಗೆ (Flask) ಮಾಹಿತಿಯನ್ನು ಕಳುಹಿಸುವುದು
-                    const response = await fetch('http://127.0.0.1:5000/chat', {
-                        method: 'POST',
+                    const response = await fetch('https://trayee-ai-backend.onrender.com/chat', {                        method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
