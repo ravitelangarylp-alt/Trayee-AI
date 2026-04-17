@@ -125,6 +125,8 @@
             border-radius: 8px;
             line-height: 1.7;
             font-size: 1.05rem;
+            word-wrap: break-word;
+            white-space: pre-wrap;
         }
 
         .bot {
@@ -141,6 +143,21 @@
             color: #f0d080;
         }
 
+        /* ಹೊಸ File Info ಡಿಸೈನ್ */
+        .file-info-container {
+            background: #120700;
+            padding: 0 16px;
+            text-align: right;
+        }
+        
+        #file-info {
+            color: #c8860a;
+            font-size: 0.85rem;
+            display: none;
+            padding-top: 5px;
+            font-style: italic;
+        }
+
         .input-area {
             display: flex;
             gap: 10px;
@@ -149,9 +166,31 @@
             border-top: 1px solid #5a3a00;
             position: sticky;
             bottom: 0;
+            align-items: center;
         }
 
-        input {
+        /* ಹೊಸ ಅಟ್ಯಾಚ್‌ಮೆಂಟ್ ಬಟನ್ ಡಿಸೈನ್ */
+        .attach-btn {
+            background: #2a1500;
+            border: 1px solid #5a3a00;
+            color: #f0d080;
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .attach-btn:hover {
+            background: #3a2000;
+            border-color: #c8860a;
+        }
+
+        input[type="text"] {
             flex: 1;
             background: #2a1500;
             border: 1px solid #5a3a00;
@@ -163,8 +202,8 @@
             outline: none;
         }
 
-        input::placeholder { color: #8a6030; }
-        input:focus { border-color: #c8860a; }
+        input[type="text"]::placeholder { color: #8a6030; }
+        input[type="text"]:focus { border-color: #c8860a; }
 
         .send-btn {
             background: #c8860a;
@@ -213,7 +252,14 @@
     <div class="chat-box" id="chatBox"></div>
 </div>
 
+<div class="file-info-container">
+    <div id="file-info"></div>
+</div>
+
 <div class="input-area">
+    <label for="fileUpload" class="attach-btn" title="Upload File">📎</label>
+    <input type="file" id="fileUpload" style="display: none;" accept=".txt,.pdf,.jpg,.jpeg,.png">
+
     <input type="text" id="userInput" 
            placeholder="संस्कृतपदं वा वाक्यं वा लिखत... (Type Sanskrit word or question)"
            autocomplete="off">
@@ -221,6 +267,17 @@
 </div>
 
 <script>
+    // ಬಳಕೆದಾರರು ಫೈಲ್ ಆಯ್ಕೆ ಮಾಡಿದಾಗ ಹೆಸರು ತೋರಿಸಲು
+    document.getElementById('fileUpload').addEventListener('change', function() {
+        const fileInfo = document.getElementById('file-info');
+        if (this.files.length > 0) {
+            fileInfo.innerText = "📎 Selected File: " + this.files[0].name;
+            fileInfo.style.display = 'block';
+        } else {
+            fileInfo.style.display = 'none';
+        }
+    });
+
     function fillInput(text) {
         document.getElementById('userInput').value = text;
         sendMessage();
@@ -228,35 +285,55 @@
 
     async function sendMessage() {
         const input = document.getElementById('userInput');
+        const fileInput = document.getElementById('fileUpload');
         const chatBox = document.getElementById('chatBox');
+        
         const messageText = input.value.trim();
+        const file = fileInput.files[0];
 
-        if (!messageText) return;
+        // ಮೆಸೇಜ್ ಅಥವಾ ಫೈಲ್ ಎರಡರಲ್ಲಿ ಒಂದು ಇದ್ದರೆ ಮಾತ್ರ ಕಳುಹಿಸಿ
+        if (!messageText && !file) return;
 
         // Welcome screen hide
         document.getElementById('welcome').style.display = 'none';
         document.getElementById('suggestions').style.display = 'none';
 
-        // User message
+        // User message UI
         const userDiv = document.createElement('div');
         userDiv.className = 'message user';
-        userDiv.innerText = messageText;
+        
+        let displayMsg = messageText;
+        if (file) {
+            displayMsg += (displayMsg ? '\n\n' : '') + '📎 [File Attached: ' + file.name + ']';
+        }
+        userDiv.innerText = displayMsg || '📎 [File Attached]';
         chatBox.appendChild(userDiv);
+        
+        // Input Clear 
         input.value = '';
+        fileInput.value = '';
+        document.getElementById('file-info').style.display = 'none';
         chatBox.scrollTop = chatBox.scrollHeight;
 
-        // Loading
+        // Loading UI
         const botDiv = document.createElement('div');
         botDiv.className = 'message bot loading';
         botDiv.innerText = 'उत्तरं अन्विष्यते...';
         chatBox.appendChild(botDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
 
+        // FormData ಸೃಷ್ಟಿ (Backend ಗೆ ಕಳುಹಿಸಲು)
+        const formData = new FormData();
+        formData.append('message', messageText);
+        if (file) {
+            formData.append('file', file);
+        }
+
         try {
             const response = await fetch('https://trayee-ai-backend.onrender.com/chat', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: messageText })
+                // ಗಮನಿಸಿ: FormData ಬಳಸುವಾಗ 'Content-Type' header ಹಾಕಬಾರದು
+                body: formData
             });
 
             const data = await response.json();
