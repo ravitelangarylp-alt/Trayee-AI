@@ -6,7 +6,7 @@ import anthropic
 app = Flask(__name__)
 CORS(app)
 
-api_key = os.environ.get("GOOGLE_API_KEY")
+api_key = os.environ.get("CLAUDE_API_KEY")
 client = anthropic.Anthropic(api_key=api_key)
 
 @app.route('/chat', methods=['POST'])
@@ -22,7 +22,7 @@ def chat():
         print("👉 Sending prompt to Claude...", flush=True)
 
         message = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-sonnet-4-5",
             max_tokens=1024,
             messages=[{"role": "user", "content": prompt}]
         )
