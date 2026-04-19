@@ -39,7 +39,7 @@ def chat():
 
         # Anthropic API Call (Sonnet 4.6)
         message = client.messages.create(
-            model="claude-4-6-sonnet-latest", # ನಿಮ್ಮ API ಅಕೌಂಟ್‌ನಲ್ಲಿರುವ ಮಾಡೆಲ್ ಹೆಸರನ್ನು ಇಲ್ಲಿ ಬಳಸಿ
+            model="claude-sonnet-4-5",
             max_tokens=1024,
             system=system_instructions,
             messages=[{"role": "user", "content": user_prompt}]
